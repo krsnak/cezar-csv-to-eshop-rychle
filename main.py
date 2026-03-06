@@ -610,7 +610,7 @@ async def edit_categories(request: Request):
         html += f"""
       <p>
         Produkt: {p['kod']} – {p['nazev']}<br>
-        Navržené kategorie: {p['kategorie_auto']}
+        Navržené kategorie: {p['kategorie']}
       </p>
         """
 
