@@ -554,7 +554,7 @@ async def edit_text(request: Request):
     <head><meta charset="utf-8"><title>Editace textů</title></head>
     <body style="font-family:sans-serif;max-width:1600px;margin:40px auto;">
       <h2>Editace názvů a HTML popisů (podporuje Markdown)</h2>
-      <form method="post" action="/export">
+      <form method="post" action="/edit-categories">
         <table border="1" cellpadding="6" cellspacing="0">
           <tr>
             <th>Kód</th>
