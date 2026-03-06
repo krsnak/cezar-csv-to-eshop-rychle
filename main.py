@@ -584,6 +584,47 @@ async def edit_text(request: Request):
     return html
 
 
+@app.post("/edit-categories", response_class=HTMLResponse)
+async def edit_categories(request: Request):
+    global GENERATED_PRODUCTS
+
+    form = await request.form()
+
+    for i, p in enumerate(GENERATED_PRODUCTS):
+        name_field = f"name_{i}"
+        desc_field = f"desc_{i}"
+
+        if name_field in form:
+            p["nazev"] = str(form[name_field])
+        if desc_field in form:
+            p["popis"] = str(form[desc_field])
+
+    html = """
+    <html>
+    <head><meta charset="utf-8"><title>Editace kategorií</title></head>
+    <body style="font-family:sans-serif;max-width:1200px;margin:40px auto;">
+      <h2>Editace kategorií</h2>
+    """
+
+    for p in GENERATED_PRODUCTS:
+        html += f"""
+      <p>
+        Produkt: {p['kod']} – {p['nazev']}<br>
+        Navržené kategorie: {p['kategorie_auto']}
+      </p>
+        """
+
+    html += """
+      <form method="post" action="/export">
+        <button type="submit">Pokračovat na export</button>
+      </form>
+    </body>
+    </html>
+    """
+
+    return html
+
+
 @app.post("/export")
 async def export(request: Request):
     global GENERATED_PRODUCTS
