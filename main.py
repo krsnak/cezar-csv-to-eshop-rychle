@@ -313,6 +313,68 @@ def format_parametry_string(params: dict) -> str:
     return "|-|".join(parts)
 
 
+CATEGORY_TREE = [
+    {"name": "Novinky", "id": "16-0-0-0", "children": []},
+    {"name": "Aranžmá, dekorace", "id": "17-0-0-0", "children": []},
+    {"name": "Výrobky chráněné dílny", "id": "26-0-0-0", "children": [
+        {"name": "Výrobky ze dřeva", "id": "26-147-0-0"},
+        {"name": "Výrobky z látky", "id": "26-148-0-0"},
+        {"name": "Výrobky z proutí", "id": "26-149-0-0"},
+        {"name": "Aranžování, dekorace", "id": "26-150-0-0"},
+    ]},
+    {"name": "Floristické potřeby", "id": "3-0-0-0", "children": [
+        {"name": "Aranžérské pomůcky", "id": "3-5-0-0"},
+        {"name": "Stuhy, fólie, provazy, juta", "id": "3-3-0-0"},
+        {"name": "Věnce, dekorační základy", "id": "3-58-0-0"},
+        {"name": "Materiál pro dekorace", "id": "3-59-0-0"},
+        {"name": "Tašky, boxy", "id": "3-146-0-0"},
+    ]},
+    {"name": "Umělé a sušené květiny", "id": "8-0-0-0", "children": [
+        {"name": "Exotika bez stopky", "id": "8-14-0-0"},
+        {"name": "Exotika na stopce", "id": "8-21-0-0"},
+        {"name": "Dekorace do vázy", "id": "8-23-0-0"},
+        {"name": "Umělé květiny", "id": "8-16-0-0"},
+        {"name": "Umělé dekorace, vazby, aranže", "id": "8-53-0-0"},
+    ]},
+    {"name": "Koše a košíky", "id": "19-0-0-0", "children": [
+        {"name": "proutěné", "id": "19-61-0-0"},
+        {"name": "dřevěné", "id": "19-62-0-0"},
+        {"name": "ostatní", "id": "19-151-0-0"},
+    ]},
+    {"name": "Obaly na květináče, truhlíky", "id": "20-0-0-0", "children": [
+        {"name": "dřevěné", "id": "20-69-0-0"},
+        {"name": "proutěné", "id": "20-70-0-0"},
+        {"name": "plechové", "id": "20-73-0-0"},
+        {"name": "keramické", "id": "20-74-0-0"},
+        {"name": "misky", "id": "20-75-0-0"},
+        {"name": "plastové", "id": "20-68-0-0"},
+        {"name": "ostatní", "id": "20-76-0-0"},
+    ]},
+    {"name": "Bytové dekorace", "id": "21-0-0-0", "children": [
+        {"name": "proutěné", "id": "21-77-0-0"},
+        {"name": "dřevěné", "id": "21-78-0-0"},
+        {"name": "látkové", "id": "21-81-0-0"},
+        {"name": "plechové", "id": "21-83-0-0"},
+        {"name": "keramické", "id": "21-84-0-0"},
+        {"name": "svíčky", "id": "21-133-0-0"},
+        {"name": "ostatní", "id": "21-85-0-0"},
+    ]},
+    {"name": "Sezónní dekorace", "id": "22-0-0-0", "children": [
+        {"name": "Valentýn, svatba", "id": "22-86-0-0"},
+        {"name": "Jarní dekorace", "id": "22-87-0-0"},
+        {"name": "Velikonoční dekorace", "id": "22-88-0-0"},
+        {"name": "Podzimní dekorace", "id": "22-89-0-0"},
+        {"name": "Dušičky", "id": "22-90-0-0"},
+        {"name": "Vánoce a Advent", "id": "22-134-0-0"},
+    ]},
+    {"name": "Dům a zahrada", "id": "24-0-0-0", "children": [
+        {"name": "Zahradní doplňky", "id": "24-109-0-0"},
+        {"name": "Ostatní", "id": "24-110-0-0"},
+    ]},
+    {"name": "Výprodej", "id": "6-0-0-0", "children": []},
+]
+
+
 # -------------------------
 # ROUTES
 # -------------------------
