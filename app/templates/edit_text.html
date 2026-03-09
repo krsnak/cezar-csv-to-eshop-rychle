@@ -1,0 +1,55 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Editace textů</title>
+</head>
+
+<body style="font-family:sans-serif;max-width:1600px;margin:40px auto;">
+
+<h2>Editace názvů a HTML popisů (Markdown)</h2>
+
+<form method="post" action="/edit-text">
+
+<table border="1" cellpadding="6" cellspacing="0">
+
+<tr>
+<th>Kód</th>
+<th>Název</th>
+<th>Popis (Markdown)</th>
+</tr>
+
+{% for p in products %}
+
+<tr>
+<td>{{ p.kod }}</td>
+
+<td>
+<input
+type="text"
+name="name_{{ loop.index0 }}"
+value="{{ p.nazev }}"
+style="width:400px;">
+</td>
+
+<td>
+<textarea
+name="popis_{{ loop.index0 }}"
+style="width:500px;height:120px;">{{ p.popis }}</textarea>
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<button type="submit">
+Pokračovat na editaci parametrů
+</button>
+
+</form>
+
+</body>
+</html>

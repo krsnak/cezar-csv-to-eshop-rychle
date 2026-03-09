@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Editace kategorií</title>
+
+<style>
+body{
+    font-family:sans-serif;
+    max-width:1200px;
+    margin:40px auto;
+}
+
+.category-root{
+    margin-top:10px;
+}
+
+.category-child{
+    margin-left:25px;
+}
+
+h3{
+    margin-top:30px;
+}
+</style>
+
+</head>
+<body>
+
+<h2>Editace kategorií</h2>
+
+<form method="post" action="/export">
+
+<h3>Kategorie</h3>
+
+{% for code,data in category_tree.items() %}
+
+<div class="category-root">
+<label>
+<input type="checkbox" name="cat" value="{{ code }}">
+<b>{{ data.name }}</b>
+</label>
+</div>
+
+{% for child in data.children %}
+
+<div class="category-child">
+<label>
+<input type="checkbox" name="cat" value="{{ child[0] }}">
+{{ child[1] }}
+</label>
+</div>
+
+{% endfor %}
+
+{% endfor %}
+
+<br><br>
+
+<button type="submit">
+Uložit kategorie a exportovat CSV
+</button>
+
+</form>
+
+</body>
+</html>
