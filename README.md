@@ -1,9 +1,3 @@
-Dobře. Uděláme kvalitní README rovnou použitelné pro repo.
-
-Níže máš hotový obsah — jen copy-paste do `README.md`.
-
----
-
 # 📄 README.md
 
 ```markdown
