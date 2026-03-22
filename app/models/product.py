@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict
 
-# Product data model will be defined here
-
 @dataclass
 class ProductDraft:
     kod: str
@@ -26,3 +24,7 @@ class ProductDraft:
     cenove_hladiny: str
 
     params: Dict[str, str] = field(default_factory=dict)
+
+    # DEBUG / AI vysvětlení
+    debug_category_reason: str = ""
+    is_category_edited: bool = False

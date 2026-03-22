@@ -8,7 +8,7 @@
 
 <h2>Editace parametrů</h2>
 
-<form method="post" action="/edit-categories">
+<form method="post" action="/edit-params?page={{ page }}">
 
 <table border="1" cellpadding="6" cellspacing="0">
 
@@ -32,7 +32,7 @@
 {% for key in param_keys %}
 <td>
 
-<select name="{{ key }}_{{ i }}">
+<select name="{{ key }}_{{ loop.index0 + (page-1)*5 }}"">
 
 {% for option in param_options[key] %}
 <option value="{{ option }}"
@@ -62,6 +62,22 @@ Pokračovat na editaci kategorií
 </button>
 
 </form>
+
+<div style="margin-top:30px">
+
+    {% if page > 1 %}
+    <a href="/edit-params?page={{ page-1 }}">
+    <button type="button">← Předchozí</button>
+    </a>
+    {% endif %}
+    
+    {% if products|length == 5 %}
+    <a href="/edit-params?page={{ page+1 }}">
+    <button type="button">Další →</button>
+    </a>
+    {% endif %}
+    
+    </div>
 
 </body>
 </html>

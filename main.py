@@ -12,6 +12,8 @@ from app.services.param_infer import infer_parametry
 from app.services.csv_parser import decode_csv_bytes
 from app.services.exporter import format_price, format_stock
 from app.models.product import ProductDraft
+from app.services.category_infer import infer_kategorie
+from app.services.category_learning import add_learning_rule
 
 
 app = FastAPI()
@@ -212,6 +214,7 @@ async def convert(request: Request, file: UploadFile = File(...), page: int = 1)
         cenove_hladiny = f"velkoobchod#-#{zakladni}"
 
         params = infer_parametry(f"{nazev} {popis}")
+        kategorie, reason = infer_kategorie(f"{nazev} {popis}", params)
 
         GENERATED_PRODUCTS.append(
             ProductDraft(
@@ -223,13 +226,14 @@ async def convert(request: Request, file: UploadFile = File(...), page: int = 1)
                 nase=nase,
                 stock=stock,
                 je_skladem=je_skladem,
-                kategorie=CONST_KATEGORIE,
+                kategorie=kategorie,
                 novinka=CONST_NOVINKA,
                 uvod=CONST_UVOD,
                 diskuze=CONST_DISKUZE,
                 dph=CONST_DPH,
                 cenove_hladiny=cenove_hladiny,
                 params=params,
+                debug_category_reason=reason,
             )
         )
 
@@ -249,49 +253,218 @@ async def convert(request: Request, file: UploadFile = File(...), page: int = 1)
     )
 
 # ------------------------------------------------
+@app.get("/edit-text", response_class=HTMLResponse)
+async def edit_text_page(request: Request, page: int = 1):
 
+    global GENERATED_PRODUCTS
+
+    start = (page - 1) * PAGE_SIZE
+    end = start + PAGE_SIZE
+
+    products_page = GENERATED_PRODUCTS[start:end]
+
+    return templates.TemplateResponse(
+        "edit_text.html",
+        {
+            "request": request,
+            "products": products_page,
+            "page": page
+        },
+    )
 @app.post("/edit-text", response_class=HTMLResponse)
-async def edit_text(request: Request):
+async def edit_text(request: Request, page: int = 1):
 
     global GENERATED_PRODUCTS
 
     form = await request.form()
 
-    for i,p in enumerate(GENERATED_PRODUCTS):
+    for key in form:
 
-        if f"name_{i}" in form:
-            p.nazev = str(form[f"name_{i}"])
+        if "_" not in key:
+            continue
 
-        if f"popis_{i}" in form:
-            p.popis = str(form[f"popis_{i}"])
+        field, idx = key.rsplit("_", 1)
 
-        p.params = infer_parametry(f"{p.nazev} {p.popis}")
+        if not idx.isdigit():
+            continue
+
+        idx = int(idx)
+
+        if idx < len(GENERATED_PRODUCTS):
+
+            if field == "name":
+                GENERATED_PRODUCTS[idx].nazev = form[key]
+
+            if field == "popis":
+                GENERATED_PRODUCTS[idx].popis = form[key]
+
+    from fastapi.responses import RedirectResponse
+
+    return RedirectResponse(
+        url="/edit-params?page=1",
+        status_code=303
+    )
+
+@app.get("/edit-params", response_class=HTMLResponse)
+async def edit_params_page(request: Request, page: int = 1):
+
+    global GENERATED_PRODUCTS
+
+    start = (page - 1) * PAGE_SIZE
+    end = start + PAGE_SIZE
+
+    products_page = GENERATED_PRODUCTS[start:end]
 
     return templates.TemplateResponse(
         "edit_params.html",
         {
             "request": request,
-            "products": GENERATED_PRODUCTS,
+            "products": products_page,
             "param_keys": PARAM_KEYS,
             "param_options": PARAM_OPTIONS,
+            "page": page,
         }
     )
 
+@app.post("/edit-params", response_class=HTMLResponse)
+async def edit_params(request: Request, page: int = 1):
+
+    global GENERATED_PRODUCTS
+
+    form = await request.form()
+
+    for key in form:
+
+        if "_" not in key:
+            continue
+
+        param, idx = key.rsplit("_", 1)
+
+        if not idx.isdigit():
+            continue
+
+        idx = int(idx)
+
+        if param in PARAM_KEYS:
+            if idx < len(GENERATED_PRODUCTS):
+                GENERATED_PRODUCTS[idx].params[param] = form[key]
+
+    start = (page - 1) * PAGE_SIZE
+    end = start + PAGE_SIZE
+
+    products_page = GENERATED_PRODUCTS[start:end]
+
+    from fastapi.responses import RedirectResponse
+
+    return RedirectResponse(
+        url="/edit-categories?page=1",
+        status_code=303
+    )
 # ------------------------------------------------
+@app.get("/edit-categories", response_class=HTMLResponse)
+async def edit_categories_page(request: Request, page: int = 1):
+
+    global GENERATED_PRODUCTS
+
+    start = (page - 1) * PAGE_SIZE
+    end = start + PAGE_SIZE
+
+    products_page = GENERATED_PRODUCTS[start:end]
+
+    return templates.TemplateResponse(
+        "edit_categories.html",
+        {
+            "request": request,
+            "products": products_page,
+            "page": page
+        }
+    )
 
 @app.post("/edit-categories", response_class=HTMLResponse)
 async def edit_categories(request: Request):
+
+    form = await request.form()
+
+    for key in form:
+
+        if key.startswith("cat_"):
+
+            idx = int(key.split("_")[1])
+
+            if idx < len(GENERATED_PRODUCTS):
+                GENERATED_PRODUCTS[idx].kategorie = form.getlist(key)
 
     return templates.TemplateResponse(
         "edit_categories.html",
         {
             "request": request,
             "products": GENERATED_PRODUCTS,
-            "category_tree": CATEGORY_TREE
+            "category_tree": CATEGORY_TREE,
+            "page": 1
         }
     )
 
 # ------------------------------------------------
+
+@app.get("/category-select/{idx}", response_class=HTMLResponse)
+async def category_select_page(request: Request, idx: int):
+
+    global GENERATED_PRODUCTS
+
+    if idx >= len(GENERATED_PRODUCTS):
+        return HTMLResponse("Produkt nenalezen")
+
+    product = GENERATED_PRODUCTS[idx]
+
+    return templates.TemplateResponse(
+        "category_select.html",
+        {
+            "request": request,
+            "product": product,
+            "idx": idx,
+            "category_tree": CATEGORY_TREE
+        }
+    )
+
+
+@app.post("/category-select/{idx}", response_class=HTMLResponse)
+async def category_select_save(request: Request, idx: int):
+
+    global GENERATED_PRODUCTS
+
+    if idx >= len(GENERATED_PRODUCTS):
+        return HTMLResponse("Produkt nenalezen")
+
+    form = await request.form()
+
+    selected = form.getlist("cat")
+
+    GENERATED_PRODUCTS[idx].kategorie = "|".join(selected)
+    GENERATED_PRODUCTS[idx].is_category_edited = True
+
+    # --- LEARNING ---
+    product = GENERATED_PRODUCTS[idx]
+
+    text = f"{product.nazev} {product.popis}".lower()
+
+    words = [
+        w.strip(".,:-_/()")
+        for w in text.split()
+        if len(w) > 4
+    ]
+
+    keywords = list(dict.fromkeys(words))[:3]
+
+    add_learning_rule(keywords, selected)
+
+    from fastapi.responses import RedirectResponse
+
+    page = request.query_params.get("page", "1")
+
+    return RedirectResponse(
+        url=f"/edit-categories?page={page}",
+        status_code=303
+    )
 
 @app.post("/export")
 async def export(request: Request):
@@ -299,13 +472,6 @@ async def export(request: Request):
     global GENERATED_PRODUCTS
 
     form = await request.form()
-    selected_categories = form.getlist("cat")
-    categories_string = "|".join(selected_categories)
-
-    for i,p in enumerate(GENERATED_PRODUCTS):
-        key = f"cat_{i}"
-        if key in form:
-            p.kategorie = form[key]
 
     header = load_eshop_header()
 
@@ -321,7 +487,7 @@ async def export(request: Request):
 
         row=[""]*len(header)
         
-        p.kategorie = categories_string
+   
 
         final_desc = markdown.markdown(p.popis)
 

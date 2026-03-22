@@ -5,61 +5,91 @@
 <title>Editace kategorií</title>
 
 <style>
+
 body{
     font-family:sans-serif;
-    max-width:1200px;
+    max-width:1000px;
     margin:40px auto;
 }
 
-.category-root{
-    margin-top:10px;
+.product{
+    border-bottom:1px solid #ddd;
+    padding:15px 0;
 }
 
-.category-child{
-    margin-left:25px;
+.product-name{
+    font-weight:bold;
+    margin-bottom:6px;
 }
 
-h3{
+.debug{
+    font-size:12px;
+    color:#666;
+    margin-bottom:6px;
+}
+
+.controls{
     margin-top:30px;
 }
+
 </style>
 
 </head>
+
 <body>
 
 <h2>Editace kategorií</h2>
 
 <form method="post" action="/export">
 
-<h3>Kategorie</h3>
+{% for p in products %}
 
-{% for code,data in category_tree.items() %}
+<div class="product">
 
-<div class="category-root">
-<label>
-<input type="checkbox" name="cat" value="{{ code }}">
-<b>{{ data.name }}</b>
-</label>
+<div class="product-name">
+    {{ p.nazev }}
+    
+    {% if p.is_category_edited %}
+    <span style="color:green;margin-left:10px;">✔</span>
+    {% endif %}
+    
+    </div>
+
+<div class="debug">
+{{ p.debug_category_reason }}
 </div>
 
-{% for child in data.children %}
+<a href="/category-select/{{ loop.index0 + (page-1)*5 }}?page={{ page }}">
+<button type="button">
+Vybrat / upravit kategorie
+</button>
+</a>
 
-<div class="category-child">
-<label>
-<input type="checkbox" name="cat" value="{{ child[0] }}">
-{{ child[1] }}
-</label>
 </div>
 
 {% endfor %}
 
-{% endfor %}
+<div class="controls">
+
+{% if page > 1 %}
+<a href="/edit-categories?page={{ page-1 }}">
+<button type="button">← Předchozí</button>
+</a>
+{% endif %}
+
+{% if products|length == 5 %}
+<a href="/edit-categories?page={{ page+1 }}">
+<button type="button">Další →</button>
+</a>
+{% endif %}
 
 <br><br>
 
 <button type="submit">
-Uložit kategorie a exportovat CSV
+Exportovat CSV
 </button>
+
+</div>
 
 </form>
 

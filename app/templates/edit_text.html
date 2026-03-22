@@ -8,7 +8,7 @@
 
 <h2>Editace názvů a HTML popisů (Markdown)</h2>
 
-<form method="post" action="/edit-text">
+<form method="post" action="/edit-text?page={{ page }}">
 
 <table border="1" cellpadding="6" cellspacing="0">
 
@@ -26,14 +26,14 @@
 <td>
 <input
 type="text"
-name="name_{{ loop.index0 }}"
+name="name_{{ loop.index0 + (page-1)*5 }}"
 value="{{ p.nazev }}"
 style="width:400px;">
 </td>
 
 <td>
 <textarea
-name="popis_{{ loop.index0 }}"
+name="popis_{{ loop.index0 + (page-1)*5 }}"
 style="width:500px;height:120px;">{{ p.popis }}</textarea>
 </td>
 
@@ -51,5 +51,20 @@ Pokračovat na editaci parametrů
 
 </form>
 
+<div style="margin-top:30px">
+
+    {% if page > 1 %}
+    <a href="/edit-text?page={{ page-1 }}">
+    <button type="button">← Předchozí</button>
+    </a>
+    {% endif %}
+    
+    {% if products|length == 5 %}
+    <a href="/edit-text?page={{ page+1 }}">
+    <button type="button">Další →</button>
+    </a>
+    {% endif %}
+    
+    </div>
 </body>
 </html>
