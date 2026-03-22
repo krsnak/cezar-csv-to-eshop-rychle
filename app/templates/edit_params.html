@@ -1,0 +1,83 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Editace parametrů</title>
+</head>
+
+<body style="font-family:sans-serif;max-width:1600px;margin:40px auto;">
+
+<h2>Editace parametrů</h2>
+
+<form method="post" action="/edit-params?page={{ page }}">
+
+<table border="1" cellpadding="6" cellspacing="0">
+
+<tr>
+<th>Kód</th>
+<th>Název</th>
+
+{% for key in param_keys %}
+<th>{{ key }}</th>
+{% endfor %}
+
+</tr>
+
+{% for p in products %}
+{% set i = loop.index0 %}
+
+<tr>
+<td>{{ p.kod }}</td>
+<td>{{ p.nazev }}</td>
+
+{% for key in param_keys %}
+<td>
+
+<select name="{{ key }}_{{ loop.index0 + (page-1)*5 }}"">
+
+{% for option in param_options[key] %}
+<option value="{{ option }}"
+{% if option == p.params.get(key, "") %}
+selected
+{% endif %}
+>
+{{ option }}
+</option>
+{% endfor %}
+
+</select>
+
+</td>
+{% endfor %}
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<button type="submit">
+Pokračovat na editaci kategorií
+</button>
+
+</form>
+
+<div style="margin-top:30px">
+
+    {% if page > 1 %}
+    <a href="/edit-params?page={{ page-1 }}">
+    <button type="button">← Předchozí</button>
+    </a>
+    {% endif %}
+    
+    {% if products|length == 5 %}
+    <a href="/edit-params?page={{ page+1 }}">
+    <button type="button">Další →</button>
+    </a>
+    {% endif %}
+    
+    </div>
+
+</body>
+</html>
